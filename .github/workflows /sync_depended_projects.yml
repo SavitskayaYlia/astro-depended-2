@@ -1,0 +1,49 @@
+# syntax
+#  https://docs.github.com/en/actions/writing-workflows/workflow-syntax-for-github-actions#jobsjob_idsteps
+
+#  https://docs.github.com/en/actions/writing-workflows/choosing-what-your-workflow-does/accessing-contextual-information-about-workflow-runs#github-context
+
+name: Automatically create PR for dependent projects
+run-name: PR ${{ github.event.pull_request.html_url }} Auto propagation changes
+on:
+  pull_request:
+    types: closed
+
+jobs:
+  merge_pr:
+    name: Create the PR for the dependent projects
+    runs-on: ubuntu-latest
+    env:
+      PR: ${{ github.event.pull_request.html_url }}
+      #SOURCE: ${{ github.event.pull_request.head.ref }}
+      #TARGET: ${{ github.event.pull_request.base.ref }}
+    steps:
+      - name: Common information
+        run: |
+          echo "Auto propagation changes of PR $PR "
+          echo "The PR source branch is ${{github.event.pull_request.head.ref}}"
+          echo "The PR target branch is ${{github.event.pull_request.base.ref}}"
+          echo "The PR is merged: ${{github.event.pull_request.merged}}"
+      - name: Check conditions
+        # Trigger when a PR is closed and meged to main
+        run: |
+          echo "condition_met=true" >> $GITHUB_ENV
+        if: github.event.pull_request.merged == true && github.event.pull_request.base.ref == 'main'
+
+
+
+      - name: Checkout code
+        if: env.condition_met == 'true'
+        uses: actions/checkout@v4
+
+      - name: Push changes
+        if: env.condition_met == 'true'
+        uses: BetaHuhn/repo-file-sync-action@v1
+        with:
+          GH_PAT: ${{ secrets.GH_TOKEN }}
+          CONFIG_PATH: .github/sync_depended_projects_conf.yml
+          PR_LABELS: |
+            file-sync
+            automerge
+          BRANCH_PREFIX:
+

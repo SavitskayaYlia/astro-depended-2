@@ -1,0 +1,7 @@
+group:
+  - repos: |
+      SavitskayaYlia/ci-cd-depended2@dev
+      SavitskayaYlia/ci-cd-privat2@development
+    files:
+      - python/
+      - README.md
