@@ -1,0 +1,30 @@
+group:
+  - repos: |
+      SavitskayaYlia/astro-depended-1@dev
+      SavitskayaYlia/astro-depended-2@dev
+      SavitskayaYlia/astro-depended-1@main
+      SavitskayaYlia/astro-depended-2@main    
+    files: 
+      - .github/
+      - dags/
+      - README.md
+      - dags/example/
+      - tests/
+      - Dockerfile
+      - requirements.txt
+    exclude: |
+      .gitignore
+      .github/sync_depended_projects_conf.yml
+      dags/example/exampledag.py
+    deleteOrphaned: true
+    
+
+SavitskayaYlia/astro-depended-1@dev:
+  - source: .github/
+    exclude: |
+      .github/sync_depended_projects_conf.yml    
+      
+SavitskayaYlia/astro-depended-1@main:
+  - source: .github/
+    exclude: |
+      .github/sync_depended_projects_conf.yml   
