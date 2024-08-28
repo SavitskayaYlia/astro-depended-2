@@ -1,0 +1,23 @@
+name: TEs_1
+run-name: Test_1
+on:
+  workflow_dispatch # for test purpose
+
+jobs:
+  create_pr:
+    name: Create the PR for the dependent projects
+    runs-on: ubuntu-latest
+    env:
+      PR: ${{ github.event.pull_request.html_url }}
+    steps:
+      - name: Check conditions
+        run: |
+          echo "Trigger this workflow when a PR is closed and meged to main branch " 
+          echo "condition_met=true" >> $GITHUB_ENV
+          
+      - name: Common information
+        run: |
+          echo "Auto propagation changes of PR ${{github.event.pull_request.html_url}} " 
+          echo "The PR source branch is ${{github.event.pull_request.head.ref}}"
+          echo "The PR target branch is ${{github.event.pull_request.base.ref}}"
+          echo "The PR is merged: ${{github.event.pull_request.merged}}"          
