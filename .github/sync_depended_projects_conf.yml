@@ -1,7 +1,23 @@
 group:
   - repos: |
-      SavitskayaYlia/ci-cd-depended2@dev
-      SavitskayaYlia/ci-cd-privat2@development
-    files:
-      - python/
+      SavitskayaYlia/astro-depended-1@dev
+      SavitskayaYlia/astro-depended-2@dev
+      SavitskayaYlia/astro-depended-1@main
+      SavitskayaYlia/astro-depended-2@main    
+    files: 
+      - .github/
+      - dags/
       - README.md
+      - dags/example/
+      - tests/
+      - Dockerfile
+      - requirements.txt
+    exclude:
+      - .gitignore
+      #.astro/
+      #airflow_settings.yaml      
+      - .github/sync_depended_projects_conf.yml
+      - dags/example/exampledag.py
+    
+
+      
