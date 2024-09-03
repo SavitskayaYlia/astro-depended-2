@@ -1,0 +1,47 @@
+# As soon as any changes are merged into the main branch of a Git repository, 
+# a GitHub Action is triggered to create pull requests in dependent projects.
+
+name: Automatically create PR for dependent projects
+run-name: Auto propagation changes in main branch to depended projects
+on:
+  pull_request:
+    types: closed
+  workflow_dispatch: # for test purpose
+
+jobs:
+  create_pr:
+    name: Create the PR for the dependent projects
+    runs-on: ubuntu-latest
+    env:
+      PR: ${{ github.event.pull_request.html_url }}
+    steps:
+      - name: Check conditions
+        run: |
+          echo "Trigger this workflow when a PR is closed and meged to main branch " 
+          echo "condition_met=true" >> $GITHUB_ENV
+        # for test purpose
+        if: github.event.pull_request.merged == true && github.event.pull_request.base.ref == 'main'
+
+      - name: Common information
+        run: |
+          echo "Auto propagation changes of PR ${{github.event.pull_request.html_url}} " 
+          echo "The PR source branch is ${{github.event.pull_request.head.ref}}"
+          echo "The PR target branch is ${{github.event.pull_request.base.ref}}"
+          echo "The PR is merged: ${{github.event.pull_request.merged}}"          
+
+      - name: Checkout code
+        if: env.condition_met == 'true'
+        uses: actions/checkout@v4
+
+      - name: Push changes
+        if: env.condition_met == 'true'
+        uses: BetaHuhn/repo-file-sync-action@v1
+        with:
+          GH_PAT: ${{ secrets.GH_TOKEN }}
+          CONFIG_PATH: .github/sync_depended_projects_conf.yml
+          PR_LABELS: |
+            file-sync
+            automatically-created
+          BRANCH_PREFIX: sync_${{github.run_id}} # add the prefix to pr branch 
+          PR_BODY: "Auto propagation changes of PR ${{github.event.pull_request.html_url}}"
+          OVERWRITE_EXISTING_PR: false
